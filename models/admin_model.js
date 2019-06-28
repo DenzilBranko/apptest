@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 const role = require('../models/helper');
 const pool =  require('../config/db_config')
-const user_role = require('../config/config')
 
 
 let userSignUp = async(data) => {
@@ -17,7 +16,7 @@ let userSignUp = async(data) => {
         if(existed.rowCount>0) {
             return {status: "duplicate"}
         }
-        let role_result = await role.callRoleStatus(user_role.update,user_role.read)
+        let role_result = await role.callRoleStatus('all')
         if(role_result.length<0) {
             return {status: "not foud"}
         }
@@ -38,28 +37,6 @@ let userSignUp = async(data) => {
 }
 
 
-const userSignIn = async(data) => {
-   
-    let query = `select e.id as user_id,e.email,e.password from tbl_user e where e.email=$1;`;
-    try {
-        const client  = await pool.connect()
-        let query_result = await client.query(query,[data])
-        // console.log(query_result)
-        if(query_result.rows.length>0) {
-            this.password = query_result.rows[0].password
-            // console.log(query_result.rows[0]) 
-          return query_result.rows[0]
-        }
-        return 0;
-    }catch(error) {
-       
-        throw error
-    }
-}
-
-
 module.exports = {
     userSignUp,
-    userSignIn
-
 }
