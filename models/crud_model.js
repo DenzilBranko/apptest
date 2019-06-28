@@ -2,26 +2,18 @@
 
 const pool =  require('../config/db_config')
 
-createUser = (data) => {
-    try {
-        const client  = await pool.connect()
-    } catch(err) {
-
-    }
-   
-    //sql to create user
-}
-
 let getUserRecord = async(data="") => {
+   
     let all_data = []
     let data_by_id = [];
-     
-    let query1 = `select * from tbl_user`;
-    let query2 = `select * from tbl_user where id=$1`
+   
+    let query1 = `select full_name,email from tbl_user`;
+    let query2 = `select full_name,email from tbl_user where id=$1`
     try {
         const client  = await pool.connect()
        if(data ==="") {
-            all_data = await client.query(query1,[0])
+            all_data = await client.query(query1)
+           
             return all_data.rows
        } else {
             data_by_id = await client.query(query2,[data]) 

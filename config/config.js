@@ -1,10 +1,10 @@
 let role = {
-    read: "Read",
-    write: "Write",
-    delete: "Delete",
-    update: "Update",
-    deny: "Deny",
-    all: "All",
+    read: "read",
+    write: "write",
+    delete: "delete",
+    update: "update",
+    deny: "deny",
+    all: "all",
 }
 
 module.exports = role;

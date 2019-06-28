@@ -5,8 +5,9 @@ const pool =  require('../config/db_config')
 const user_role = require('../config/config')
 
 
-let userSignUp = async(data) => {
+let userSignUp = async(data,app_user) => {
     try {
+        let role_insert;
         let { fullname,email,password } = data
         let check_existed = `select * from tbl_user where email=$1`;
         let insert_data = `insert into tbl_user(full_name,email,password) values($1,$2,$3) returning id`
@@ -17,15 +18,17 @@ let userSignUp = async(data) => {
         if(existed.rowCount>0) {
             return {status: "duplicate"}
         }
-        let role_result = await role.callRoleStatus(user_role.update,user_role.read)
+        let role_result = await role.callRoleStatus(user_role.update,user_role.read,app_user)
+     
         if(role_result.length<0) {
             return {status: "not foud"}
         }
         let  hashPassWord = await bcrypt.hashSync(password,10);
         let  user_result = await client.query(insert_data,[fullname,email,hashPassWord])
-        
         if(user_result.rows.length>0) {
-            let role_insert = await client.query(permision,[user_result.rows[0].id,role_result[0].id])
+            for(let i=0;i<role_result.length;i++) {
+                 role_insert = await client.query(permision,[user_result.rows[0].id,role_result[i].id])
+            }
             if(role_insert.rows.length>0) {
                 return {status: "done"}
             }
@@ -44,10 +47,10 @@ const userSignIn = async(data) => {
     try {
         const client  = await pool.connect()
         let query_result = await client.query(query,[data])
-        // console.log(query_result)
+        
         if(query_result.rows.length>0) {
             this.password = query_result.rows[0].password
-            // console.log(query_result.rows[0]) 
+            
           return query_result.rows[0]
         }
         return 0;
